@@ -34,11 +34,15 @@ the "TestPQConnector.pony" is an example that doubles as a tester, setup a datab
 
 '''
 connection established: {dbinfo}
+
 connection established: {dbinfo}
+
 notification recieved: "test" from testing
+
 notification recieved: " 222" from testing
 '''
-if it looks like that (the {dbinfo} is what you inputed into the PQConnector)
+
+if it looks like that (the {dbinfo} is what you inputed into the PQConnector) the package is working correctly.
 
 # Drawbacks
 
