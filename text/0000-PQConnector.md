@@ -16,11 +16,36 @@ PQConnector support the use of interacting with postgres databases. (haven't tes
 # Detailed design
 
 the design is made to call functions and let it work, after what you got in your interface.
+
+first of all impliment the package with use "PQConnector"
+
+put up your interface, in the example "TestPQConnector.pony" this interface interaction is called "Foobar"
+```pony
+class Foobar is DBNotify
+  var _env: Env
+  new iso create(env': Env) =>
+    _env = env'
+    
+  fun ref notification_received(n: String, m: String) =>
+    _env.out.print("notification recieved: \"" + m + "\" from " + n)
+  fun ref connection_established(s: String): F32=>
+    _env.out.print("connection established: " + s)
+    0
+  fun ref connection_lost(s: String)=>
+    _env.out.print("connection lost: " + s)
+```
+after that initiate the interaction with the Database:
+```pony
+  let dbinfo = "dbname=nyxia"
+  let dbConnect = DBConnector(dbinfo, Foobar(env'))
+```
+
 This is the bulk of the RFC. Explain the design in enough detail for somebody familiar with the language to understand, and for somebody familiar with the compiler to implement. This should get into specifics and corner-cases, and include examples of how the feature is used.
 
 # How We Teach This
 
 Catagory: "Package exploration" - Name: "Easy PostGres interaction with Pony".
+
 PQConnector simplifies the usage of "lib:pq".
 
 It doesn't alter anything existing in Pony, but it adds an optional package, which has documentation comments and an example that shows everything that you would need to be able to use the package.
