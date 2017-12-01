@@ -31,6 +31,7 @@ this feature can be found in packages and doesn't nessecerily need to be taught 
 # How We Test This
 
 the "TestPQConnector.pony" is an example that doubles as a tester, setup a database in PostGres name it what you want, change the dbinfo to call the information needed to connect to your database (dbname={name} is enough if you are running a local server) and compile it, then run it, the terminal should output:
+
 '''
 connection established: {dbinfo}
 connection established: {dbinfo}
@@ -49,6 +50,8 @@ Alternatively I could put it up on github and people would download it and put i
 
 # Unresolved questions
 
-rether or not the package should be called "PQinterface" instead of "PQConnector"
+rether or not the package should be called "PQinterface" instead of "PQConnector".
+
 rether or not "dispose()" should be called "finished()" for PostGresql habits.
+
 rether or not "dispose()" should be called "destroy()" for what it does to the asio_event.
