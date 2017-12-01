@@ -9,42 +9,46 @@ interface to ease interaction with PostGresql databases
 
 # Motivation
 
-to easily interact with a database using a easy to use interface and commmands that can be easily be extended by using fun ref to execute "execute" with your own pre-fixes, as making tons of callable functions in the package would be confusing to the users, if all the difference was pre-fixed parameters.
+to easily interact with a database using a easy to use interface and commands that can be easily be extended by defining functions to execute "execute" with your own pre-fixes, as making tons of callable functions in the package would be confusing to the users, if the only differences between them are pre-fixed parameters.
 
 PQConnector support the use of interacting with postgres databases. (haven't tested if it works for other databases)
 
 # Detailed design
 
-
+the design is made to call functions and let it work, after what you got in your interface.
 This is the bulk of the RFC. Explain the design in enough detail for somebody familiar with the language to understand, and for somebody familiar with the compiler to implement. This should get into specifics and corner-cases, and include examples of how the feature is used.
 
 # How We Teach This
 
-What names and terminology work best for these concepts and why? How is this idea best presented? As a continuation of existing Pony patterns, or as a wholly new one?
+Catagory: "Package exploration" - Name: "Easy PostGres interaction with Pony".
+PQConnector simplifies the usage of "lib:pq".
 
-Would the acceptance of this proposal mean the Pony guides must be re-organized or altered? Does it change how Pony is taught to new users at any level?
+It doesn't alter anything existing in Pony, but it adds an optional package, which has documentation comments and an example that shows everything that you would need to be able to use the package.
 
 How should this feature be introduced and taught to existing Pony users?
+this feature can be found in packages and doesn't nessecerily need to be taught to the general users of Pony, but it would be appreciated to have a mention, somewhere, as well as redirected towards it, if anyone asks on the IRC about using Pony for PostGres
 
 # How We Test This
 
-How do we assure that the initial implementation works? How do we assure going forward that the new functionality works after people make changes? Do we need unit tests? Something more sophisticated? What's the scope of testing? Does this change impact the testing of other parts of Pony? Is our standard CI coverage sufficient to test this change? Is manual intervention required?
-
-In general this section should be able to serve as acceptance criteria for any implementation of the RFC.
+the "TestPQConnector.pony" is an example that doubles as a tester, setup a database in PostGres name it what you want, change the dbinfo to call the information needed to connect to your database (dbname={name} is enough if you are running a local server) and compile it, then run it, the terminal should output:
+'''
+connection established: {dbinfo}
+connection established: {dbinfo}
+notification recieved: "test" from testing
+notification recieved: " 222" from testing
+'''
+if it looks like that (the {dbinfo} is what you inputed into the PQConnector)
 
 # Drawbacks
 
-Why should we *not* do this? Things you might want to note:
-
-* Breaks existing code
-* Introduces instability into the compiler and or runtime which will result in bugs we are going to spend time tracking down
-* Maintenance cost of added code
+you have to have a PostGres server open somewhere which you can connect to, to test this package, but it should be pretty simply, and unless you break Lib:pq, i should be able to maintain it.
 
 # Alternatives
 
-What other designs have been considered? What is the impact of not doing this?
-None is not an acceptable answer. There is always to option of not implementing the RFC.
+Alternatively I could put it up on github and people would download it and put it into their Package Folder themselves. 
 
 # Unresolved questions
 
-What parts of the design are still TBD?
+rether or not the package should be called "PQinterface" instead of "PQConnector"
+rether or not "dispose()" should be called "finished()" for PostGresql habits.
+rether or not "dispose()" should be called "destroy()" for what it does to the asio_event.
