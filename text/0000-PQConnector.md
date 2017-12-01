@@ -1,17 +1,20 @@
-- Feature Name: (fill me in with a unique ident, my_awesome_feature)
-- Start Date: (fill me in with today's date, YYYY-MM-DD)
-- RFC PR: (leave this empty)
-- Pony Issue: (leave this empty)
+- Feature Name: PQConnetor
+- Start Date: 2017-12-01
+- RFC PR:
+- Pony Issue:
 
 # Summary
 
-One para explanation of the feature.
+interface to ease interaction with PostGresql databases
 
 # Motivation
 
-Why are we doing this? What use cases does it support? What is the expected outcome?
+to easily interact with a database using a easy to use interface and commmands that can be easily be extended by using fun ref to execute "execute" with your own pre-fixes, as making tons of callable functions in the package would be confusing to the users, if all the difference was pre-fixed parameters.
+
+PQConnector support the use of interacting with postgres databases. (haven't tested if it works for other databases)
 
 # Detailed design
+
 
 This is the bulk of the RFC. Explain the design in enough detail for somebody familiar with the language to understand, and for somebody familiar with the compiler to implement. This should get into specifics and corner-cases, and include examples of how the feature is used.
 
