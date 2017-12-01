@@ -32,7 +32,7 @@ this feature can be found in packages and doesn't nessecerily need to be taught 
 
 the "TestPQConnector.pony" is an example that doubles as a tester, setup a database in PostGres name it what you want, change the dbinfo to call the information needed to connect to your database (dbname={name} is enough if you are running a local server) and compile it, then run it, the terminal should output:
 
-'''
+```
 connection established: {dbinfo}
 
 connection established: {dbinfo}
@@ -40,7 +40,7 @@ connection established: {dbinfo}
 notification recieved: "test" from testing
 
 notification recieved: " 222" from testing
-'''
+```
 
 if it looks like that (the {dbinfo} is what you inputed into the PQConnector) the package is working correctly.
 
