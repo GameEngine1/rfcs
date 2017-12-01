@@ -34,11 +34,8 @@ the "TestPQConnector.pony" is an example that doubles as a tester, setup a datab
 
 ```
 connection established: {dbinfo}
-
 connection established: {dbinfo}
-
 notification recieved: "test" from testing
-
 notification recieved: " 222" from testing
 ```
 
