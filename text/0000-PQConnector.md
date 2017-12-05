@@ -25,9 +25,9 @@ class Foobar is DBNotify
   var _env: Env
   new iso create(env': Env) =>
     _env = env'
-    
   fun ref notification_received(n: String, m: String) =>
     _env.out.print("notification recieved: \"" + m + "\" from " + n)
+
   fun ref connection_established(s: String): F32=>
     _env.out.print("connection established: " + s)
     0
@@ -36,9 +36,25 @@ class Foobar is DBNotify
 ```
 after that initiate the interaction with the Database:
 ```pony
-  let dbinfo = "dbname=nyxia"
-  let dbConnect = DBConnector(dbinfo, Foobar(env'))
+actor Main
+  var _env: Env
+  let pgConnect: PGConnector
+  new create(env': Env) =>
+    let dbinfo = "dbname=nyxia"   //{connection info}
+    let dbConnect = DBConnector(dbinfo, Foobar(env'))
 ```
+this initiates the connection to the database, and lets you command it
+commands are as follows:
+
+```pony
+  pgConnect.dispose()         //this removes the timers, and connections but retain the listeners
+  pgConnect.connect()     //we only call this because of dispose(), normally it is initialized when you create it
+  pgConnect.reconnect_interval_simple(F32(1)) // sets the reconnection time to 1 second (default is 1 second anyways)
+  pgConnect.add_listen("bar") //adds "bar" as a listener that the foobar will be getting
+  pgConnect.execute("notify bar, 'shouldn't show up")
+  pgConnect.reconnect_interval(reconnectIntervalFn)
+```
+sets the reconnection interval to a lambda function
 
 This is the bulk of the RFC. Explain the design in enough detail for somebody familiar with the language to understand, and for somebody familiar with the compiler to implement. This should get into specifics and corner-cases, and include examples of how the feature is used.
 
