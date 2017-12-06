@@ -15,45 +15,76 @@ PQConnector support the use of interacting with postgres databases. (haven't tes
 
 # Detailed design
 
-the design is made to call functions and let it work, after what you got in your interface.
-
-first of all impliment the package with use "PQConnector"
-
-put up your interface, in the example "TestPQConnector.pony" this interface interaction is called "Foobar"
 ```pony
-class Foobar is DBNotify
-  var _env: Env
-  new iso create(env': Env) =>
-    _env = env'
-  fun ref notification_received(n: String, m: String) =>
-    _env.out.print("notification recieved: \"" + m + "\" from " + n)
+actor PGConnector
 
-  fun ref connection_established(s: String): F32=>
-    _env.out.print("connection established: " + s)
-    0
-  fun ref connection_lost(s: String)=>
-    _env.out.print("connection lost: " + s)
+  [variables ...]
+
+    new create(connInfo: String, notifier': DBNotify iso) =>
+    _notifier = consume notifier'
+    _connInfo = connInfo
+    _conn = @PQconnectdb((_connInfo).cstring())
+    _fd = @PQsocket(_conn)
+    this.connect()
 ```
-after that initiate the interaction with the Database:
-```pony
-actor Main
-  var _env: Env
-  let pgConnect: PGConnector
-  new create(env': Env) =>
-    let dbinfo = "dbname=nyxia"   //{connection info}
-    let dbConnect = DBConnector(dbinfo, Foobar(env'))
-```
+This is what you call and set a let arround to execute commands.
 this initiates the connection to the database, and lets you command it
-commands are as follows:
 
+lets look at that last line, ``this.connect()``:
 ```pony
-  pgConnect.dispose()         //this removes the timers, and connections but retain the listeners
-  pgConnect.connect()     //we only call this because of dispose(), normally it is initialized when you create it
-  pgConnect.reconnect_interval_simple(F32(1)) // sets the reconnection time to 1 second (default is 1 second anyways)
-  pgConnect.add_listen("bar") //adds "bar" as a listener that the foobar will be getting
-  pgConnect.execute("notify bar, 'shouldn't show up")
-  pgConnect.reconnect_interval(reconnectIntervalFn)
+be connect(initial: Bool = true) =>
+    if not initial then
+      _conn = @PQconnectdb((_connInfo).cstring())
+      _fd = @PQsocket(_conn)
+      _disposed = false
+    end
+    let status = @PQstatus[I32](_conn)
+    if status != 0 then
+      _reconnectIntervals = _reconnectIntervalFn(_count)
+      _count = _count + 1
+      this._tryConnect(_reconnectIntervals)
+    else
+      @pony_asio_event_create(this, _fd, AsioEvent.read(), 0, true)
+      _reconnectIntervals = _notifier.connection_established(_connInfo)
+      for channel in _subscribedChannels.values() do
+        _listen(channel)
+      end
+      _ready2send = true
+    end
 ```
+at first
+```pony
+    if not initial then
+      _conn = @PQconnectdb((_connInfo).cstring())
+      _fd = @PQsocket(_conn)
+      _disposed = false
+    end
+```
+this connects the database if it's not the first call (as the connection has already been setup)
+```pony
+    let status = @PQstatus[I32](_conn)
+    if status != 0 then
+```
+checks the status of the connection
+```pony
+       _reconnectIntervals = _reconnectIntervalFn(_count)
+       _count = _count + 1
+       this._tryConnect(_reconnectIntervals)
+```
+if it isn't connected it reads connection interval, increases count and creates a timer that will call this function again after interval in seconds
+```pony
+@pony_asio_event_create(this, _fd, AsioEvent.read(), 0, true)
+      _reconnectIntervals = _notifier.connection_established(_connInfo)
+      for channel in _subscribedChannels.values() do
+        _listen(channel)
+      end
+      _ready2send = true
+```
+if it is connected, it sends a notification that it has connected with the conninfo.
+and listens to all listeners added, then sets a Bool that determins that it can send via the execute command. //as it would be have bad glitches without it
+    
+the behaviors and functions is pretty self-explainatory, and if that's not enough there is comments in them explaining what it does, and what you use it for.
+
 sets the reconnection interval to a lambda function
 
 This is the bulk of the RFC. Explain the design in enough detail for somebody familiar with the language to understand, and for somebody familiar with the compiler to implement. This should get into specifics and corner-cases, and include examples of how the feature is used.
